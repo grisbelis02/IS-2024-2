@@ -1,0 +1,34 @@
+@startuml
+
+[*] --right> encargarProducto
+state c <<choice>>
+state fork_state <<fork>>
+state join_state <<join>>
+
+encargarProducto --right> validarPedido : pedidoColocado
+encargarProducto --down> pagar
+
+validarPedido --right> cobrarPago
+cobrarPago --down> pagadoPorAdelantado
+
+pagar --right> pagadoPorAdelantado : pedido
+pagadoPorAdelantado --right> obtenerProducto
+
+obtenerProducto --> c : ¿Urgente?
+c --left> enviarUrgente : [Si]
+c --down> enviarOrdinario : [No]
+enviarUrgente --> enviado
+enviarOrdinario --> enviado
+enviado --down> Realizado : pedido
+
+cobrarPago --> DarCervezasALosTransportistas
+enviado --> DarCervezasALosTransportistas
+DarCervezasALosTransportistas --> fork_state
+fork_state --> anadirAListaClientesSatisfechos
+fork_state --> enviarRecibo
+
+anadirAListaClientesSatisfechos --> join_state
+enviarRecibo --> join_state
+join_state --> [*]
+
+@enduml
